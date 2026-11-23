@@ -1,0 +1,26 @@
+name: Release APK
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create release with APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          VERSION="${TAG#v}"
+          APK="apk/FubarAlphaFoxtrot-${VERSION}.apk"
+          test -f "$APK"
+          gh release create "$TAG" "$APK" \
+            --title "Fubar Alpha Foxtrot ${VERSION}" \
+            --notes-file "release-notes/${TAG}.md"
